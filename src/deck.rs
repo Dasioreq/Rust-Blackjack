@@ -1,3 +1,5 @@
+use core::num;
+
 use rand::seq::SliceRandom;
 use strum::IntoEnumIterator;
 
@@ -14,7 +16,7 @@ impl Deck
     pub fn new(num_of_decks: u8) -> Self
     {
         let mut result: Deck = Deck{cards: vec![]};
-        for _ in [0..=num_of_decks]
+        for _ in 0..num_of_decks
         {
             for suit in SUIT::iter()
             {
