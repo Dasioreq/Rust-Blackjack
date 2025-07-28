@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use rand::rng;
 use rand::seq::SliceRandom;
 use strum::IntoEnumIterator;
