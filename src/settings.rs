@@ -8,8 +8,10 @@ pub struct Settings
     pub reverse: Vec<String>,
     pub decks: u8,
     pub dealer_action_interval: f32,
-    pub dealer_player_offset: i8,
-    pub card_offset: isize
+    pub dealer_player_offset: usize,
+    pub card_offset: usize,
+    pub split_hands_offset: usize,
+    pub starting_chips: usize
 }
 
 impl Settings

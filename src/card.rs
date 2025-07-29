@@ -4,19 +4,19 @@ use crate::settings::Settings;
 #[derive(Debug, EnumIter, Clone, Copy)]
 pub enum FACE
 {
-    TWO = 2,
-    THREE = 3,
-    FOUR = 4,
-    FIVE = 5,
-    SIX = 6,
-    SEVEN = 7,
-    EIGHT = 8,
-    NINE = 9,
-    TEN = 10,
-    JACK = 11,
-    QUEEN = 12,
-    KING = 13,
-    ACE = 14
+    TWO,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX,
+    SEVEN,
+    EIGHT,
+    NINE,
+    TEN,
+    JACK,
+    QUEEN,
+    KING,
+    ACE
 }
 
 #[derive(Debug, EnumIter, Clone, Copy)]
@@ -25,14 +25,37 @@ pub enum SUIT
     CLUBS = 0,
     DIAMONDS = 1,
     HEARTS = 2,
-    SPADES = 3
+    SPADES = 3,
 } 
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Card
 {
-    face: FACE,
-    suit: SUIT
+    pub face: FACE,
+    pub suit: SUIT,
+}
+
+impl FACE
+{
+    pub fn index(&self) -> usize
+    {
+        match self
+        {
+            FACE::TWO => 0,
+            FACE::THREE => 1,
+            FACE::FOUR => 2,
+            FACE::FIVE => 3,
+            FACE::SIX => 4,
+            FACE::SEVEN => 5,
+            FACE::EIGHT => 6,
+            FACE::NINE => 7,
+            FACE::TEN => 8,
+            FACE::JACK => 9,
+            FACE::QUEEN => 10,
+            FACE::KING => 11,
+            FACE::ACE => 12,
+        }
+    }
 }
 
 impl Card
@@ -42,39 +65,60 @@ impl Card
         Card
         {
             face,
-            suit
+            suit,
         }
     }
 
-    pub fn draw(&self, settings: &Settings, x: usize, y: usize)
+    pub fn draw(&self, settings: &Settings, x: usize, y: usize, shown: bool)
     {
-        let sprite = &settings.cards[self.suit as usize][self.face as usize - 2];
+        let sprite = match shown
+        {
+            true => &settings.cards[self.suit as usize][self.face.index()],
+            false => &settings.reverse
+        };
 
         for (i, line) in sprite.iter().enumerate()
         {
-            match self.suit 
+            if(shown)
             {
-                SUIT::CLUBS => 
+                match self.suit 
                 {
-                    print!("\x1b[{};{}H{}", y + i, x, line);
-                },
-                SUIT::DIAMONDS => 
-                {
-                    print!("\x1b[31m");
-                    print!("\x1b[{};{}H{}", y + i, x, line);
-                    print!("\x1b[0m");
-                },
-                SUIT::HEARTS => 
-                {
-                    print!("\x1b[31m");
-                    print!("\x1b[{};{}H{}", y + i, x, line);
-                    print!("\x1b[0m");
-                },
-                SUIT::SPADES => 
-                {
-                    print!("\x1b[{};{}H{}", y + i, x, line);
+                    SUIT::DIAMONDS | SUIT::HEARTS => 
+                    {
+                        print!("\x1b[31m");
+                        print!("\x1b[{};{}H{}", y + i, x, line);
+                        print!("\x1b[0m");
+                    },
+                    _ => 
+                    {
+                        print!("\x1b[{};{}H{}", y + i, x, line);
+                    }
                 }
             }
+            else 
+            {
+                print!("\x1b[{};{}H{}", y + i, x, line);
+            }
+        }
+    }
+
+    pub fn value(&self) -> u8
+    {
+        match self.face
+        {
+            FACE::TWO => 2,
+            FACE::THREE => 3,
+            FACE::FOUR => 4,
+            FACE::FIVE => 5,
+            FACE::SIX => 6,
+            FACE::SEVEN => 7,
+            FACE::EIGHT => 8,
+            FACE::NINE => 9,
+            FACE::TEN => 10,
+            FACE::JACK => 10,
+            FACE::QUEEN => 10,
+            FACE::KING => 10,
+            FACE::ACE => 11,
         }
     }
 }
