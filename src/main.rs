@@ -1,14 +1,20 @@
-#![allow(unused_parens)]
+    #![allow(unused_parens)]
 
 use crate::deck::*;
-use crate::card::*;
+use crate::settings::Settings;
+
 mod deck;
 mod card;
+mod settings;
 
 fn main()
 {
-    let mut b: Deck = Deck::new(1);
-    b.shuffle();
+    let settings = Settings::load_from_files("./settings/settings.json");
+    let mut deck = Deck::new(settings.decks);
+    deck.shuffle();
 
-    println!("{:#?}", b);
+    for (i, card) in deck.cards.iter().enumerate()
+    {
+        card.draw(&settings, (1 + i as isize * settings.card_offset) as usize, 1);
+    }
 }
