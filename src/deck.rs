@@ -1,9 +1,7 @@
-use core::num;
-
 use rand::seq::SliceRandom;
 use strum::IntoEnumIterator;
 
-use crate::{card::*, hand::Hand};
+use crate::{card::*, hand::{Hand, HAND_STATE}};
 
 #[derive(Debug)]
 pub struct Deck
@@ -39,25 +37,26 @@ impl Deck
         self.cards.shuffle(&mut rand::rng());
     }
 
-    pub fn deal(&mut self, hands: &mut Vec<Hand>, num: usize)
+    pub fn deal(&mut self, hand: &mut Hand, num: usize)
     {
         for _ in 0..num
         {
-            for hand in hands.iter_mut()
+            let card = self.cards.remove(0);
+
+            hand.total += card.value();
+            if(hand.total > 21)
             {
-                let card = self.cards.remove(0);
-
-                hand.total += card.value();
-                if(hand.total > 21)
+                if let FACE::ACE = card.face
                 {
-                    if let FACE::ACE = card.face
-                    {
-                        hand.total -= 10;
-                    }
+                    hand.total -= 10;
                 }
-
-                hand.cards.push(card);
+                else
+                {
+                    hand.state = HAND_STATE::BUST;
+                }
             }
+
+            hand.cards.push(card);
         }
     }
 

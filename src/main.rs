@@ -15,7 +15,9 @@ fn main()
     
     let mut game: Game = Game::new(&settings);
 
-    game.begin(200);
-
-    game.draw(&settings);
+    while(true)
+    {
+        game.draw(&settings);
+        game.get_player_input();
+    }
 }

@@ -386,6 +386,6 @@
     "dealer_action_interval": 0.5,
     "dealer_player_offset": 9,
     "card_offset": 4,
-    "split_hands_offset": 4,
+    "split_hands_offset": 6,
     "starting_chips": 200
 }

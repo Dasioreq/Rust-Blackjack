@@ -1,11 +1,21 @@
-use crate::card::{Card, FACE, SUIT};
+use crate::card::{Card};
 use crate::settings::*;
+
+#[derive(Debug)]
+pub enum HAND_STATE
+{
+    NONE,
+    STAND,
+    DOUBLE_DOWN(usize),
+    BUST
+}
 
 #[derive(Debug)]
 pub struct Hand
 {
     pub cards: Vec<Card>,
-    pub total: u8
+    pub total: u8,
+    pub state: HAND_STATE
 }
 
 impl Hand
@@ -15,7 +25,8 @@ impl Hand
         Hand
         {
             cards: vec![],
-            total: 0
+            total: 0,
+            state: HAND_STATE::NONE
         }
     }
 
@@ -32,5 +43,21 @@ impl Hand
                 card.draw(settings, x + settings.card_offset as usize * i, y, true);
             }
         }
+    }
+
+    pub fn splittable(&self) -> bool
+    {
+        for (i, &card) in self.cards.iter().enumerate()
+        {
+            for other in self.cards[i + 1..self.cards.len()].iter()
+            {
+                if(card.face == other.face)
+                {
+                    return true
+                }
+            }
+        }
+
+        false
     }
 }

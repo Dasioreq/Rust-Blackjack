@@ -1,7 +1,7 @@
 use strum_macros::EnumIter;
 use crate::settings::Settings;
 
-#[derive(Debug, EnumIter, Clone, Copy)]
+#[derive(Debug, EnumIter, Clone, Copy, PartialEq)]
 pub enum FACE
 {
     TWO,
