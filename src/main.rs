@@ -12,7 +12,9 @@ mod game;
 
 fn main()
 {
-    let settings = Settings::load_from_files("./settings/settings.json");
+    println!("{}", (String::from(std::env::current_exe().unwrap().to_str().unwrap()) + "/settings/settings.json").as_str());
+
+    let settings = Settings::load_from_files((String::from(std::env::current_dir().unwrap().to_str().unwrap()) + "/settings/settings.json").as_str());
     
     let mut game: Game = Game::new(settings);
     let mut quit: bool = false;

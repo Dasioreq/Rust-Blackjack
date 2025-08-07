@@ -29,8 +29,8 @@ impl Game
         Game
         {
             deck: Deck::new(settings.decks),
-            player_hands: vec![Hand::new(0)],
-            dealer_hand: Hand::new(0),
+            player_hands: vec![Hand::new(vec![], 0, HAND_STATE::NONE, 0)],
+            dealer_hand: Hand::new(vec![], 0, HAND_STATE::NONE, 0),
             game_state: GAME_STATE::BETTING,
             player_chips: settings.starting_chips,
             selected_hand_index: 0,
@@ -42,13 +42,14 @@ impl Game
     {
         let mut deck = Deck::new(self.settings.decks);
         deck.shuffle();
+        self.selected_hand_index = 0;
 
         self.deck = deck;
 
-        self.player_hands = vec![Hand::new(bet)];
-        self.dealer_hand = Hand::new(0);
+        self.player_hands = vec![Hand::new(vec![], 0, HAND_STATE::NONE, bet)];
+        self.dealer_hand = Hand::new(vec![], 0, HAND_STATE::NONE, 0);
 
-        self.deck.deal_dealer(&mut self.dealer_hand, 2);
+        self.deck.deal(&mut self.dealer_hand, 2);
 
         for hand in self.player_hands.iter_mut()
         {
@@ -200,14 +201,14 @@ Availible chips: {}
                 }
                 else if(payout < self.player_bet())
                 {
-                    println!("You lose {} chips!", self.player_bet())
+                    println!("You lose {} chips!", self.player_bet() - payout)
                 }
                 else 
                 {
                     println!("Push! No chips were won or lost");
                 }
 
-                if(self.player_chips > 0)
+                if(self.player_chips + payout > 0)
                 {
                     print!("[1] \x1b[1;4mP\x1b[0mlay again ({})    ", self.player_chips + payout);
                 }
@@ -236,8 +237,11 @@ Availible chips: {}
                         '4' => self.player_hands[0].bet -= std::cmp::min(10, self.player_hands[0].bet),
                         '5' | 'b' => 
                         {
-                            self.player_chips -= self.player_hands[0].bet;
-                            self.begin(self.player_hands[0].bet);
+                            if(self.player_hands[0].bet > 0)
+                            {
+                                self.player_chips -= self.player_hands[0].bet;
+                                self.begin(self.player_hands[0].bet);
+                            }
                         },
                         _ => {}
                     }
@@ -292,7 +296,7 @@ Availible chips: {}
                             {
                                 let new_bet = std::cmp::min(self.player_chips, self.player_hands[self.selected_hand_index].bet);
                                 self.player_chips -= new_bet;
-                                let new_hands = self.player_hands[self.selected_hand_index].split(splitting_index, new_bet).unwrap();
+                                let new_hands = self.player_hands[self.selected_hand_index].split(splitting_index, new_bet);
 
                                 self.player_hands[self.selected_hand_index] = new_hands.0;
                                 self.player_hands.insert(self.selected_hand_index + 1, new_hands.1);
@@ -347,8 +351,7 @@ Availible chips: {}
                             if(self.player_chips > 0)
                             {
                                 self.player_chips += std::cmp::max(self.payout(), 0) as usize;
-                                self.dealer_hand = Hand::new(0);
-                                self.player_hands = vec![Hand::new(0)];
+                                self.player_hands = vec![Hand::new(vec![], 0, HAND_STATE::NONE, 0)];
 
                                 self.game_state = GAME_STATE::BETTING;
                             }
@@ -443,6 +446,7 @@ Availible chips: {}
                             }
                         },
                         BUST => result += hand.bet,
+                        BLACKJACK => result -= hand.bet,
                         _ => {}
                     }
                 }
